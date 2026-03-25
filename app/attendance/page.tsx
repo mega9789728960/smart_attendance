@@ -7,8 +7,8 @@ import MobileBottomNav from "@/app/components/MobileBottomNav";
 
 /* ---------- CONFIG ---------- */
 //home:
-const CAMPUS_LAT = 11.513944566899058;
-const CAMPUS_LNG = 77.24670983047233;
+const CAMPUS_LAT = 10.915109989242241;
+const CAMPUS_LNG = 78.02290699545065;
 
 //college GCE:
  //const CAMPUS_LAT = 10.694630;
