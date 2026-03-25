@@ -21,7 +21,8 @@ type LivenessState =
   | "SUCCESS"
   | "FAILED";
 
-type ChallengeStep = "BLINK" | "TURN" | "DONE";
+// Blink state kept under the hood so the main attendance page doesn't crash on enum changes
+// but the actual action is now just a Head Turn.
 
 /* ──────────────────────────────────────────────
    INSTRUCTIONS MAP
@@ -56,11 +57,9 @@ export default function LivenessFaceCapture({
   const lastVideoTimeRef = useRef<number>(-1);
 
   // State machine for liveness challenge
-  const challengeStepRef = useRef<ChallengeStep>("BLINK");
   const lostFramesRef = useRef<number>(0);
   const liveTextRef = useRef<HTMLDivElement>(null);
   const frameCountRef = useRef<number>(0);
-  const hasClosedEyesRef = useRef<boolean>(false);
 
   const updateState = useCallback((newState: LivenessState) => {
     stateRef.current = newState;
@@ -89,7 +88,7 @@ export default function LivenessFaceCapture({
             delegate: "GPU" // Closest mapping for IMAGE_FAST high-speed hardware acc
           },
           runningMode: "VIDEO",
-          outputFaceBlendshapes: true,
+          outputFaceBlendshapes: false,
           outputFacialTransformationMatrixes: false,
           numFaces: 1
         });
@@ -148,11 +147,9 @@ export default function LivenessFaceCapture({
 
   /* ── Start Liveness Challenge ── */
   function startChallenge() {
-    challengeStepRef.current = "BLINK";
     updateState("BLINK");
-    updateLiveText("Please BLINK your eyes");
+    updateLiveText("Slowly TURN your head Left or Right");
     lostFramesRef.current = 0;
-    hasClosedEyesRef.current = false;
     frameCountRef.current = 0;
   }
 
@@ -180,48 +177,24 @@ export default function LivenessFaceCapture({
             if (result.faceLandmarks && result.faceLandmarks.length > 0) {
               lostFramesRef.current = 0;
               const landmarks = result.faceLandmarks[0];
-              const blendshapes = result.faceBlendshapes ? result.faceBlendshapes[0].categories : [];
 
               drawOverlay(landmarks);
 
               if (cs === "BLINK") {
-                const step = challengeStepRef.current;
+                // Motion Detection (Head Turn) using relative position to eyes
+                const nose = landmarks[1];
+                const leftEyeOuter = landmarks[33];
+                const rightEyeOuter = landmarks[263];
                 
-                if (step === "BLINK") {
-                  // High-Speed Blink Detection
-                  const blinkLeft = blendshapes.find(b => b.categoryName === 'eyeBlinkLeft')?.score || 0;
-                  const blinkRight = blendshapes.find(b => b.categoryName === 'eyeBlinkRight')?.score || 0;
-                  
-                  if (!hasClosedEyesRef.current) {
-                    // Check if eyes are fully closed
-                    if (blinkLeft > 0.45 && blinkRight > 0.45) {
-                      hasClosedEyesRef.current = true;
-                    }
-                  } else {
-                    // Eyes were closed, wait for them to re-open to complete the blink
-                    if (blinkLeft < 0.45 && blinkRight < 0.45) {
-                      challengeStepRef.current = "TURN";
-                      updateLiveText("Now slowly TURN your head Left or Right");
-                    }
-                  }
-                } 
-                else if (step === "TURN") {
-                  // Motion Detection (Head Turn) using relative position to eyes
-                  const nose = landmarks[1];
-                  const leftEyeOuter = landmarks[33];
-                  const rightEyeOuter = landmarks[263];
-                  
-                  const eyeCenter = (leftEyeOuter.x + rightEyeOuter.x) / 2;
-                  const turnDiff = nose.x - eyeCenter;
-                  
-                  // Nose moves significantly left or right
-                  if (turnDiff < -0.04 || turnDiff > 0.04) {
-                    challengeStepRef.current = "DONE";
-                    updateState("VERIFYING");
-                    updateLiveText("Capturing...");
-                    captureAndVerify();
-                    return; // Stop loop
-                  }
+                const eyeCenter = (leftEyeOuter.x + rightEyeOuter.x) / 2;
+                const turnDiff = nose.x - eyeCenter;
+                
+                // Nose moves significantly left or right
+                if (turnDiff < -0.04 || turnDiff > 0.04) {
+                  updateState("VERIFYING");
+                  updateLiveText("Capturing...");
+                  captureAndVerify();
+                  return; // Stop loop
                 }
               }
             } else if (cs === "BLINK") {
@@ -308,8 +281,6 @@ export default function LivenessFaceCapture({
   /* ── UI ── */
   const info = INSTRUCTIONS[state];
   const isActive = state === "BLINK";
-
-  const isBlinkDone = isActive && challengeStepRef.current === "TURN";
   
   return (
     <div className="space-y-4">
@@ -331,7 +302,7 @@ export default function LivenessFaceCapture({
              ref={liveTextRef}
              className="text-lg font-bold mt-2 text-blue-900 animate-pulse"
           >
-             Please BLINK your eyes
+             Slowly TURN your head Left or Right
           </div>
         )}
       </div>
@@ -340,16 +311,10 @@ export default function LivenessFaceCapture({
       {(isActive || state === "VERIFYING" || state === "SUCCESS") && (
         <div className="flex justify-center gap-4">
           <div className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-            isBlinkDone || state === "VERIFYING" || state === "SUCCESS"
+            state === "VERIFYING" || state === "SUCCESS"
               ? "bg-green-500 text-white" : "bg-blue-500 text-white animate-pulse"
           }`}>
-            1. Blink
-          </div>
-          <div className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-            state === "VERIFYING" || state === "SUCCESS"
-              ? "bg-green-500 text-white" : (isBlinkDone ? "bg-blue-500 text-white animate-pulse" : "bg-gray-200 text-gray-500")
-          }`}>
-            2. Turn Head
+            Turn Head
           </div>
         </div>
       )}
