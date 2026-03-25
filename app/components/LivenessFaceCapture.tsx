@@ -132,7 +132,7 @@ export default function LivenessFaceCapture({
         setModelsReady(true);
 
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "user", width: 480, height: 360 },
+          video: { facingMode: "user" },
         });
 
         if (cancelled) {
@@ -143,6 +143,8 @@ export default function LivenessFaceCapture({
         streamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
+          // Explicitly call play to handle mobile browser pause behavior
+          videoRef.current.play().catch(e => console.error("Video play failed:", e));
         }
 
         updateState("WAITING");
