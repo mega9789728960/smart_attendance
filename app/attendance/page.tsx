@@ -7,7 +7,7 @@ import MobileBottomNav from "@/app/components/MobileBottomNav";
 
 /* ---------- CONFIG ---------- */
 //home:
-const CAMPUS_LAT = 10.915116435130969;
+const CAMPUS_LAT = 10.915115266696855;
 const CAMPUS_LNG = 78.02329840239925;
 
 
