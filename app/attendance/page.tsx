@@ -21,7 +21,7 @@ const CAMPUS_LNG = 78.02329840239925;
 // const CAMPUS_LAT = 11.0765000;
 // const CAMPUS_LNG = 77.1420000;
 
-const ALLOWED_RADIUS = 2000; // meters
+const ALLOWED_RADIUS = 20000; // meters
 
 // ✅ ATTENDANCE RULES
 const OFFICE_START_TIME = "09:30";
@@ -184,7 +184,7 @@ export default function Attendance() {
         );
 
         if (distance > ALLOWED_RADIUS) {
-          setStatus("❌ You are outside the allowed campus area");
+          setStatus(`❌ Outside allowed area (Dist: ${Math.round(distance)}m)`);
           setLoading(false);
           setPunchAction(null);
           return;
@@ -194,10 +194,15 @@ export default function Attendance() {
         setShowFace(true);
         setLoading(false);
       },
-      () => {
-        setStatus("❌ Location permission denied");
+      (err) => {
+        setStatus(`❌ Location error: ${err.message}`);
         setLoading(false);
         setPunchAction(null);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0,
       }
     );
   }
