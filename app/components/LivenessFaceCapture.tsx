@@ -62,15 +62,15 @@ function estimateHeadPose(landmarks: faceapi.FaceLandmarks68) {
   // Convert to approximate degrees
   const pitchDeg = (pitchRatio - 0.6) * -100;
 
-  return { yawDeg, pitchDeg };
+  return { yawRatio, pitchRatio, yawDeg, pitchDeg };
 }
 
 /* ──────────────────────────────────────────────
    THRESHOLDS
    ────────────────────────────────────────────── */
-const YAW_LEFT_THRESHOLD = 20;    // Yaw > 20° → looking left
-const YAW_RIGHT_THRESHOLD = -20;  // Yaw < -20° → looking right
-const PITCH_DOWN_THRESHOLD = -12; // Pitch < -12° → looking down
+const YAW_LEFT_THRESHOLD_OFFSET = 0.15;    // +15% from baseline (looking left)
+const YAW_RIGHT_THRESHOLD_OFFSET = -0.15;  // -15% from baseline (looking right)
+const PITCH_DOWN_THRESHOLD_OFFSET = -0.10; // -10% from baseline (looking down)
 
 /* ──────────────────────────────────────────────
    INSTRUCTIONS MAP
@@ -107,6 +107,13 @@ export default function LivenessFaceCapture({
   // Refs for state machine (used inside animation loop to avoid stale closures)
   const stateRef = useRef<LivenessState>("LOADING");
   const startTimeRef = useRef<number>(0);
+
+  // Fast-Capture Optimizations Refs
+  const baselineYawRef = useRef<number>(0.5);
+  const baselinePitchRef = useRef<number>(0.6);
+  const smoothedYawRef = useRef<number | null>(null);
+  const smoothedPitchRef = useRef<number | null>(null);
+  const successTimerRef = useRef<number>(0);
 
   const updateState = useCallback((newState: LivenessState) => {
     stateRef.current = newState;
@@ -146,6 +153,7 @@ export default function LivenessFaceCapture({
         }
 
         updateState("WAITING");
+        runDetectionLoop();
       } catch (err) {
         console.error("Init error:", err);
         updateState("FAILED");
@@ -172,7 +180,6 @@ export default function LivenessFaceCapture({
   function startChallenge() {
     updateState("LOOK_LEFT");
     startTimeRef.current = Date.now();
-    runDetectionLoop();
   }
 
   /* ── Detection Loop ── */
@@ -204,24 +211,52 @@ export default function LivenessFaceCapture({
           .withFaceLandmarks();
 
         if (detection) {
-          const { yawDeg, pitchDeg } = estimateHeadPose(detection.landmarks);
-          setYaw(Math.round(yawDeg));
-          setPitch(Math.round(pitchDeg));
+          const { yawRatio, pitchRatio, yawDeg, pitchDeg } = estimateHeadPose(detection.landmarks);
+
+          if (smoothedYawRef.current === null || smoothedPitchRef.current === null) {
+            smoothedYawRef.current = yawDeg;
+            smoothedPitchRef.current = pitchDeg;
+          } else {
+            smoothedYawRef.current = smoothedYawRef.current * 0.8 + yawDeg * 0.2;
+            smoothedPitchRef.current = smoothedPitchRef.current * 0.8 + pitchDeg * 0.2;
+          }
+
+          setYaw(Math.round(smoothedYawRef.current));
+          setPitch(Math.round(smoothedPitchRef.current));
 
           // Draw overlay on canvas
-          drawOverlay(detection, yawDeg, pitchDeg);
+          drawOverlay(detection, smoothedYawRef.current, smoothedPitchRef.current);
 
           // State machine transitions
           const cs = stateRef.current;
 
-          if (cs === "LOOK_LEFT" && yawDeg > YAW_LEFT_THRESHOLD) {
-            updateState("LOOK_RIGHT");
-          } else if (cs === "LOOK_RIGHT" && yawDeg < YAW_RIGHT_THRESHOLD) {
-            updateState("LOOK_DOWN");
-          } else if (cs === "LOOK_DOWN" && pitchDeg < PITCH_DOWN_THRESHOLD) {
-            updateState("VERIFYING");
-            await captureAndVerify();
-            return;
+          if (cs === "WAITING") {
+            baselineYawRef.current = yawRatio;
+            baselinePitchRef.current = pitchRatio;
+            successTimerRef.current = 0;
+          } else if (cs === "LOOK_LEFT" && yawRatio > baselineYawRef.current + YAW_LEFT_THRESHOLD_OFFSET) {
+            if (!successTimerRef.current) successTimerRef.current = Date.now();
+            if (Date.now() - successTimerRef.current > 200) {
+              updateState("LOOK_RIGHT");
+              successTimerRef.current = 0;
+            }
+          } else if (cs === "LOOK_RIGHT" && yawRatio < baselineYawRef.current + YAW_RIGHT_THRESHOLD_OFFSET) {
+            if (!successTimerRef.current) successTimerRef.current = Date.now();
+            if (Date.now() - successTimerRef.current > 200) {
+              updateState("LOOK_DOWN");
+              successTimerRef.current = 0;
+            }
+          } else if (cs === "LOOK_DOWN" && pitchRatio < baselinePitchRef.current + PITCH_DOWN_THRESHOLD_OFFSET) {
+            if (!successTimerRef.current) successTimerRef.current = Date.now();
+            if (Date.now() - successTimerRef.current > 200) {
+              updateState("VERIFYING");
+              successTimerRef.current = 0;
+              await captureAndVerify();
+              return;
+            }
+          } else {
+            // Reset delay if pose leaves threshold
+            successTimerRef.current = 0;
           }
         }
       } catch (err) {
@@ -313,7 +348,11 @@ export default function LivenessFaceCapture({
   function handleRetry() {
     setYaw(0);
     setPitch(0);
+    smoothedYawRef.current = null;
+    smoothedPitchRef.current = null;
+    successTimerRef.current = 0;
     updateState("WAITING");
+    runDetectionLoop();
   }
 
   /* ── UI ── */
