@@ -7,7 +7,7 @@ import FaceRegister from "@/app/components/FaceRegister";
 import InlineEditEmployeeModal from "@/app/components/InlineEditEmployeeModal";
 
 type Employee = {
-  id: number;
+  id: string;
   employee_id: string;
   name: string;
   department: string;
@@ -51,7 +51,7 @@ export default function EmployeesPage() {
     setLoading(false);
   }
 
-  async function deleteEmployee(id: number) {
+  async function deleteEmployee(id: string) {
     if (!confirm("Delete this employee?")) return;
     await supabase.from("employees").delete().eq("id", id);
     loadEmployees();

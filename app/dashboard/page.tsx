@@ -26,7 +26,7 @@ ChartJS.register(
 
 /* ---------- TYPES ---------- */
 type TodayAttendance = {
-  id: number;
+  id: string;
   employee_id: string;
   punch_in: string | null;
   remark: string | null;

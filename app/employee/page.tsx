@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 type Attendance = {
-  id: number;
+  id: string;
   date: string;
   status: string | null;
 };

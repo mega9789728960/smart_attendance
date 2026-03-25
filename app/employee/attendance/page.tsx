@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import MobileBottomNav from "@/app/components/MobileBottomNav";
 
 type Attendance = {
-  id: number;
+  id: string;
   date: string;
   status: string | null;
   punch_in?: string | null;

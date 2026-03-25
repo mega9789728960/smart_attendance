@@ -4,7 +4,7 @@ import { useState } from "react";
 
 type Props = {
   employee: {
-    id: number;
+    id: string;
     employee_id: string;
     name: string;
     department: string;

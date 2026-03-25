@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 type Employee = {
-  id: number;
+  id: string;
   employee_id: string;
   name: string;
   department: string;

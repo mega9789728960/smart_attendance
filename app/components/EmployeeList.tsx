@@ -8,7 +8,7 @@ type EmployeeListProps = {
 };
 
 type Employee = {
-  id: number;
+  id: string;
   employee_id: string;
   name: string;
   department: string;
@@ -18,7 +18,7 @@ export default function EmployeeList({ refreshKey }: EmployeeListProps) {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editDepartment, setEditDepartment] = useState("");
 
@@ -41,7 +41,7 @@ export default function EmployeeList({ refreshKey }: EmployeeListProps) {
     fetchEmployees();
   }, [refreshKey]);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     const confirmDelete = confirm("Are you sure you want to delete this employee?");
     if (!confirmDelete) return;
 
@@ -67,7 +67,7 @@ export default function EmployeeList({ refreshKey }: EmployeeListProps) {
     setEditDepartment("");
   };
 
-  const saveEdit = async (id: number) => {
+  const saveEdit = async (id: string) => {
     const { error } = await supabase
       .from("employees")
       .update({
