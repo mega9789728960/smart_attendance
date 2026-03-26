@@ -319,20 +319,28 @@ export default function LivenessFaceCapture({
       )}
 
       {/* ── Camera Feed ── */}
-      <div className="relative rounded-xl overflow-hidden border-2 border-gray-200 bg-black">
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          playsInline
-          className="w-full rounded-xl"
-          style={{ transform: "scaleX(-1)" }}
-        />
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0 w-full h-full pointer-events-none"
-          style={{ transform: "scaleX(-1)" }}
-        />
+      <div className="flex justify-center w-full my-6">
+        <div 
+          className={`relative rounded-full overflow-hidden border-4 transition-all duration-500 w-[280px] h-[280px] bg-black ${
+            state === "VERIFYING" || state === "SUCCESS" 
+              ? "border-blue-500 shadow-[0_0_15px_#bfdbfe]" 
+              : "border-gray-200"
+          }`}
+        >
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            playsInline
+            className="w-full h-full object-cover absolute inset-0"
+            style={{ transform: "scaleX(-1)" }}
+          />
+          <canvas
+            ref={canvasRef}
+            className="w-full h-full object-cover absolute inset-0 pointer-events-none"
+            style={{ transform: "scaleX(-1)" }}
+          />
+        </div>
       </div>
 
       {/* ── Action Buttons ── */}
