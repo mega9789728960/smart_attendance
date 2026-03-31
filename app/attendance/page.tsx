@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import * as faceapi from "face-api.js";
 import LivenessFaceCapture from "@/app/components/LivenessFaceCapture";
 import MobileBottomNav from "@/app/components/MobileBottomNav";
 
@@ -84,6 +85,7 @@ export default function Attendance() {
   const [showFace, setShowFace] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [punchAction, setPunchAction] = useState<PunchAction | null>(null);
+  const [modelsLoaded, setModelsLoaded] = useState(false);
 
   // Track today's attendance state
   const [hasPunchedIn, setHasPunchedIn] = useState(false);
@@ -98,7 +100,20 @@ export default function Attendance() {
   /* ✅ Load logged-in employee + today's attendance on mount */
   useEffect(() => {
     init();
+    loadFaceModels();
   }, []);
+
+  async function loadFaceModels() {
+    try {
+      const MODEL_URL = "/models";
+      await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+      await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+      await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+      setModelsLoaded(true);
+    } catch (err) {
+      console.error("Failed to load generic face models", err);
+    }
+  }
 
   async function init() {
     setLoading(true);
@@ -215,11 +230,40 @@ export default function Attendance() {
     setLoading(true);
     setStatus("🔍 Verifying face with backend...");
 
-    // TODO: The LivenessFaceCapture now returns a base64 snapshot.
-    // You should send `imageSrc` to your backend for face matching here.
-    // Bypassing local face matching for now.
-    /*
+    if (!modelsLoaded) {
+      setStatus("❌ Face matching models not loaded yet.");
+      setLoading(false);
+      setShowFace(false);
+      setPunchAction(null);
+      return;
+    }
+
+    // 1. Create an image element from the base64 output of MediaPipe
+    const img = new Image();
+    img.src = imageSrc;
+    await new Promise((resolve) => {
+      img.onload = resolve;
+    });
+
+    // 2. Extract descriptor using face-api.js
+    const detection = await faceapi
+      .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
+      .withFaceLandmarks()
+      .withFaceDescriptor();
+
+    if (!detection) {
+      setStatus("❌ Could not extract face features for matching. Try again.");
+      setLoading(false);
+      setShowFace(false);
+      setPunchAction(null);
+      return;
+    }
+
+    const liveDescriptor = Array.from(detection.descriptor);
+
+    // 3. Compare with stored descriptor from the database
     const distance = faceDistance(liveDescriptor, storedFace);
+    console.log(`Face match distance: ${distance}`);
 
     if (distance > 0.6) {
       setStatus("❌ Face mismatch. Attendance denied.");
@@ -228,7 +272,6 @@ export default function Attendance() {
       setPunchAction(null);
       return;
     }
-    */
 
     const today = new Date().toISOString().split("T")[0];
     const now = new Date();
