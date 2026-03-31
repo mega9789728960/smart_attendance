@@ -31,24 +31,24 @@ export default function EmployeeAttendancePage() {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user || !user.email) {
+    if (!user) {
       router.replace("/login");
-      return;
-    }
-
-    if (user.email === "admin@company.com") {
-      router.replace("/dashboard");
       return;
     }
 
     const { data: employee, error: empError } = await supabase
       .from("employees")
-      .select("employee_id, face_descriptor")
-      .eq("email", user.email)
+      .select("employee_id, face_descriptor, role")
+      .eq("auth_user_id", user.id)
       .single();
 
     if (empError || !employee) {
       router.replace("/login");
+      return;
+    }
+
+    if (employee.role === "admin") {
+      router.replace("/dashboard");
       return;
     }
 

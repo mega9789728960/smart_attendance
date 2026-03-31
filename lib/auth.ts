@@ -13,6 +13,13 @@ export async function getCurrentUser() {
   return user;
 }
 
-export function isAdmin(email: string | undefined | null) {
-  return email === "admin@company.com";
+export async function getUserRole(userId: string): Promise<string> {
+  const { data, error } = await supabase
+    .from("employees")
+    .select("role")
+    .eq("auth_user_id", userId)
+    .single();
+    
+  if (error || !data) return "employee";
+  return data.role || "employee";
 }

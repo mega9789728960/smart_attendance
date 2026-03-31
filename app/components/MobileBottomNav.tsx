@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { getUserRole } from "@/lib/auth";
 
 type Role = "admin" | "employee";
 
@@ -20,10 +21,11 @@ export default function MobileBottomNav() {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user?.email) return;
+    if (!user) return;
 
-    // ✅ ADMIN CHECK
-    setRole(user.email === "admin@company.com" ? "admin" : "employee");
+    // ✅ DB ROLE CHECK
+    const dbRole = await getUserRole(user.id);
+    setRole(dbRole as Role);
   }
 
   async function handleLogout() {

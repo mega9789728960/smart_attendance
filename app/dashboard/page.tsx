@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getCurrentUser, isAdmin } from "@/lib/auth";
+import { getCurrentUser, getUserRole } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import MobileBottomNav from "@/app/components/MobileBottomNav";
 
@@ -110,7 +110,8 @@ export default function DashboardPage() {
   async function init() {
     const user = await getCurrentUser();
     if (!user) return router.replace("/login");
-    if (!isAdmin(user.email)) return router.replace("/employee/attendance");
+    const role = await getUserRole(user.id);
+    if (role !== "admin") return router.replace("/employee/attendance");
     await loadStats();
     setLoading(false);
   }

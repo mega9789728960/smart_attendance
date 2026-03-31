@@ -1,56 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
+import { login } from "./actions";
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  async function handleLogin() {
-    if (!email || !password) {
-      alert("Enter email and password");
-      return;
-    }
-
+  async function clientAction(formData: FormData) {
     setLoading(true);
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
+    setErrorMsg("");
+    const result = await login(formData);
+    if (result?.error) {
+      setErrorMsg(result.error);
+    }
     setLoading(false);
-
-    if (error || !data.user) {
-      alert(error?.message || "Login failed");
-      return;
-    }
-
-    // ✅ ADMIN LOGIN
-    if (data.user.email === "admin@company.com") {
-      router.replace("/dashboard");
-      return;
-    }
-
-    // ✅ EMPLOYEE LOGIN CHECK
-    const { data: employee, error: empError } = await supabase
-      .from("employees")
-      .select("employee_id")
-      .eq("email", data.user.email)
-      .single();
-
-    if (empError || !employee) {
-      alert("You are not registered as an employee");
-      await supabase.auth.signOut();
-      return;
-    }
-
-    // ✅ EMPLOYEE DASHBOARD
-    router.replace("/attendance");
   }
 
   return (
@@ -66,33 +30,41 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <div className="mb-4">
-          <label className="text-sm text-gray-600">Email</label>
-          <input
-            type="email"
-            className="mt-1 w-full border rounded-lg px-4 py-2"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
+        {errorMsg && (
+          <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-lg text-sm text-center">
+            {errorMsg}
+          </div>
+        )}
 
-        <div className="mb-6">
-          <label className="text-sm text-gray-600">Password</label>
-          <input
-            type="password"
-            className="mt-1 w-full border rounded-lg px-4 py-2"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
+        <form action={clientAction}>
+          <div className="mb-4">
+            <label className="text-sm text-gray-600">Email</label>
+            <input
+              name="email"
+              type="email"
+              required
+              className="mt-1 w-full border rounded-lg px-4 py-2"
+            />
+          </div>
 
-        <button
-          onClick={handleLogin}
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold"
-        >
-          {loading ? "Signing in..." : "Login"}
-        </button>
+          <div className="mb-6">
+            <label className="text-sm text-gray-600">Password</label>
+            <input
+              name="password"
+              type="password"
+              required
+              className="mt-1 w-full border rounded-lg px-4 py-2"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold"
+          >
+            {loading ? "Signing in..." : "Login"}
+          </button>
+        </form>
       </div>
     </main>
   );
