@@ -8,8 +8,8 @@ import MobileBottomNav from "@/app/components/MobileBottomNav";
 
 /* ---------- CONFIG ---------- */
 //home:
-const CAMPUS_LAT = 11.5139460
-const CAMPUS_LNG = 77.2467090;
+const CAMPUS_LAT = 11.503639884280672;
+const CAMPUS_LNG = 77.24349695299837;
 //college GCE:
 //const CAMPUS_LAT = 10.694630;
 //const CAMPUS_LNG = 78.979179;
@@ -383,41 +383,41 @@ export default function Attendance() {
   const isPunchOutDisabled = !hasPunchedIn || hasPunchedOut || loading;
 
   return (
-    <div className="min-h-screen bg-blue-50 flex items-center justify-center px-4 pb-20">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6 space-y-5">
-        <h2 className="text-2xl font-bold text-center text-blue-700">
+    <div className="min-h-screen flex items-center justify-center px-4 pb-20">
+      <div className="w-full max-w-md card space-y-6">
+        <h2 className="text-3xl font-bold text-center text-[var(--primary)] tracking-tight">
           Attendance
         </h2>
 
         {/* ── Status Message ── */}
         {status && (
-          <div className="text-center text-sm bg-blue-100 text-blue-900 p-3 rounded-lg">
+          <div className="text-center text-sm p-3 rounded-lg font-medium bg-[var(--primary-light)] text-[var(--primary)] shadow-sm">
             {status}
           </div>
         )}
 
         {/* ── Today's Summary ── */}
         {todayRecord && (
-          <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+          <div className="bg-[var(--glass-bg)] border border-[var(--glass-border)] shadow-sm rounded-xl p-5 space-y-3">
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
               Today&apos;s Record
             </h3>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Punch In</span>
-              <span className="font-medium text-green-700">
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-slate-500 font-medium">Punch In</span>
+              <span className="badge badge-success">
                 {formatTime(todayRecord.punch_in)}
               </span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Punch Out</span>
-              <span className="font-medium text-red-600">
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-slate-500 font-medium">Punch Out</span>
+              <span className="badge badge-error">
                 {formatTime(todayRecord.punch_out)}
               </span>
             </div>
             {todayRecord.remark && (
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Remark</span>
-                <span className="font-medium text-blue-700">
+              <div className="flex justify-between items-center text-sm pt-3 mt-1 border-t border-slate-100">
+                <span className="text-slate-500 font-medium">Remark</span>
+                <span className="badge badge-primary">
                   {todayRecord.remark}
                 </span>
               </div>
@@ -427,13 +427,13 @@ export default function Attendance() {
 
         {/* ── Punch In / Punch Out Buttons ── */}
         {!showFace && !loading && (
-          <div className="flex gap-3">
+          <div className="flex gap-4 pt-2">
             <button
               onClick={() => startPunch("punch_in")}
               disabled={isPunchInDisabled}
-              className={`flex-1 py-3 rounded-lg text-lg font-semibold transition-all ${isPunchInDisabled
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-green-600 text-white hover:bg-green-700 active:scale-95"
+              className={`flex-1 py-3 rounded-xl text-base font-semibold transition-all shadow-sm ${isPunchInDisabled
+                ? "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200"
+                : "bg-[var(--success)] text-white hover:bg-emerald-600 active:scale-95 hover:shadow-md"
                 }`}
             >
               Punch In
@@ -442,9 +442,9 @@ export default function Attendance() {
             <button
               onClick={() => startPunch("punch_out")}
               disabled={isPunchOutDisabled}
-              className={`flex-1 py-3 rounded-lg text-lg font-semibold transition-all ${isPunchOutDisabled
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-red-600 text-white hover:bg-red-700 active:scale-95"
+              className={`flex-1 py-3 rounded-xl text-base font-semibold transition-all shadow-sm ${isPunchOutDisabled
+                ? "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200"
+                : "bg-[var(--error)] text-white hover:bg-red-600 active:scale-95 hover:shadow-md"
                 }`}
             >
               Punch Out
@@ -454,8 +454,8 @@ export default function Attendance() {
 
         {/* ── Loading Spinner ── */}
         {loading && !showFace && (
-          <div className="text-center py-4">
-            <div className="inline-block w-8 h-8 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin" />
+          <div className="text-center py-6">
+            <div className="inline-block w-8 h-8 border-4 border-[var(--primary-light)] border-t-[var(--primary)] rounded-full animate-spin" />
           </div>
         )}
 

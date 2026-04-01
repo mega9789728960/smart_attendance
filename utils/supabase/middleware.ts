@@ -44,6 +44,9 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && isAuthRoute) {
+    if (request.nextUrl.pathname.startsWith('/register')) {
+      return supabaseResponse
+    }
     const url = request.nextUrl.clone()
     url.pathname = '/attendance' // Default redirect after login
     return NextResponse.redirect(url)

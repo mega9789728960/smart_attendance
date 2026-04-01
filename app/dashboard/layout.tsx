@@ -19,52 +19,57 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className="min-h-screen flex">
 
       {/* ================= DESKTOP SIDEBAR ================= */}
-      <aside className="hidden md:block w-64 bg-black text-white">
+      <aside className="hidden md:flex sidebar">
         <Sidebar />
       </aside>
 
       {/* ================= MOBILE SIDEBAR OVERLAY ================= */}
       {menuOpen && (
-        <div className="fixed inset-0 z-40 flex md:hidden">
-          <aside className="w-64 bg-black text-white">
+        <div className="fixed inset-0 z-50 flex md:hidden">
+          <aside className="sidebar">
             <Sidebar />
           </aside>
 
           {/* Overlay */}
           <div
-            className="flex-1 bg-black/50"
+            className="flex-1 bg-slate-900/60 backdrop-blur-sm"
             onClick={() => setMenuOpen(false)}
           />
         </div>
       )}
 
       {/* ================= MAIN AREA ================= */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col relative w-full">
 
         {/* ================= MOBILE TOP BAR ================= */}
-        <div className="md:hidden bg-black text-white p-4 flex justify-between items-center">
+        <div className="md:hidden topbar">
           <button
             onClick={() => setMenuOpen(true)}
-            className="text-sm underline"
+            className="p-2 -ml-2 rounded-lg text-slate-500 hover:bg-slate-100"
           >
-            Menu
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
 
-          <span className="font-bold">Smart Attendance</span>
+          <div className="flex items-center gap-2 translate-x-1">
+            <img src="/logo.png" alt="Logo" className="w-[32px] h-[32px] object-contain drop-shadow-sm" />
+            <span className="font-bold text-slate-900 text-lg tracking-tight hidden sm:inline-block">
+              Smart<span className="text-[var(--primary)]">Attendance</span>
+            </span>
+          </div>
 
           <button
             onClick={logout}
-            className="text-sm bg-red-600 px-3 py-1 rounded"
+            className="text-sm font-semibold text-[var(--error)] bg-[var(--error)]/10 px-3 py-1.5 rounded-lg transition-colors hover:bg-[var(--error)] hover:text-white"
           >
             Logout
           </button>
         </div>
 
         {/* ================= PAGE CONTENT ================= */}
-        <main className="flex-1 p-4 md:p-6 overflow-x-hidden">
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto overflow-x-hidden bg-slate-50">
           {children}
         </main>
       </div>

@@ -64,12 +64,17 @@ export default function EmployeesPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-8">
       {/* HEADER */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Employees</h2>
-        <div className="bg-linear-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold">
-          Total: {total}
+      <div className="rounded-2xl bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)] p-8 shadow-lg text-white relative overflow-hidden flex items-center justify-between">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10">
+          <h1 className="text-3xl font-bold tracking-tight">Employees Directory</h1>
+          <p className="text-[var(--primary-light)] text-sm mt-1.5 font-medium">Manage personnel and face data</p>
+        </div>
+        <div className="relative z-10 bg-white/20 backdrop-blur-md px-5 py-2.5 rounded-xl border border-white/30 flex items-center gap-2 shadow-sm">
+          <span className="text-sm font-semibold text-white/90">TOTAL</span>
+          <span className="text-2xl font-bold tracking-tight">{total}</span>
         </div>
       </div>
 
@@ -80,52 +85,54 @@ export default function EmployeesPage() {
         {employees.map((emp) => (
           <div
             key={emp.id}
-            className="bg-white rounded-xl shadow border p-4 space-y-3"
+            className="card p-5 space-y-4"
           >
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-start border-b border-slate-100 pb-3">
               <div>
-                <p className="text-xs text-gray-500">Employee ID</p>
-                <p className="font-semibold">{emp.employee_id}</p>
+                <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Employee ID</p>
+                <p className="font-mono font-bold text-slate-800 text-sm mt-0.5">{emp.employee_id}</p>
               </div>
 
               <span
-                className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                className={`badge ${
                   emp.face_descriptor
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
+                    ? "badge-success"
+                    : "badge-error"
                 }`}
               >
-                {emp.face_descriptor ? "Face ✓" : "Face ✕"}
+                {emp.face_descriptor ? "Face Registered" : "Face Missing"}
               </span>
             </div>
 
             <div>
-              <p className="text-lg font-bold text-blue-700">
+              <p className="text-lg font-bold text-slate-800 tracking-tight">
                 {emp.name}
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-slate-500 font-medium">
                 {emp.department}
               </p>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 pt-2">
               <button
                 onClick={() => setSelectedEmployee(emp)}
-                className="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm"
+                className="flex-1 btn btn-primary py-2 text-sm shadow-sm"
               >
-                Register Face
+                Face Auth
               </button>
 
               <button
                 onClick={() => setEditEmployee(emp)}
-                className="px-3 bg-indigo-100 text-indigo-700 rounded-lg"
+                className="px-4 bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors rounded-xl shadow-sm"
+                title="Edit Employee"
               >
-                ✏️
+                ✎
               </button>
 
               <button
                 onClick={() => deleteEmployee(emp.id)}
-                className="px-3 bg-red-100 text-red-700 rounded-lg"
+                className="px-4 bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/20 transition-colors rounded-xl shadow-sm"
+                title="Delete Employee"
               >
                 🗑
               </button>
@@ -135,67 +142,69 @@ export default function EmployeesPage() {
       </div>
 
       {/* ================= DESKTOP TABLE ================= */}
-      <div className="hidden md:block bg-white rounded-xl shadow border overflow-x-auto">
-        <table className="w-full text-left">
-          <thead className="bg-blue-50 text-blue-800">
-            <tr>
-              <th className="p-4">Employee ID</th>
-              <th className="p-4">Name</th>
-              <th className="p-4">Department</th>
-              <th className="p-4">Face</th>
-              <th className="p-4">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {employees.map((emp) => (
-              <tr key={emp.id} className="border-t">
-                <td className="p-4">{emp.employee_id}</td>
-                <td className="p-4 font-medium">{emp.name}</td>
-                <td className="p-4">{emp.department}</td>
-                <td className="p-4">
-                  {emp.face_descriptor ? (
-                    <span className="text-green-600 font-semibold">
-                      Yes
-                    </span>
-                  ) : (
-                    <span className="text-red-600 font-semibold">
-                      No
-                    </span>
-                  )}
-                </td>
-                <td className="p-4 space-x-2">
-                  <button
-                    onClick={() => setSelectedEmployee(emp)}
-                    className="bg-blue-600 text-white px-3 py-1 rounded"
-                  >
-                    Face
-                  </button>
-                  <button
-                    onClick={() => setEditEmployee(emp)}
-                    className="text-indigo-600 text-sm hover:underline"
-                  >
-                    ✏️ Edit
-                  </button>
-                  <button
-                    onClick={() => deleteEmployee(emp.id)}
-                    className="bg-red-100 text-red-700 px-3 py-1 rounded"
-                  >
-                    Delete
-                  </button>
-                </td>
+      <div className="hidden md:block card p-6">
+        <div className="border border-slate-200 rounded-xl overflow-hidden">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Employee ID</th>
+                <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Name</th>
+                <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Department</th>
+                <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Face Data</th>
+                <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="text-sm">
+              {employees.map((emp) => (
+                <tr key={emp.id} className="border-b border-slate-100/60 hover:bg-slate-50/50 transition-colors last:border-0">
+                  <td className="p-4 font-mono font-medium text-slate-600">{emp.employee_id}</td>
+                  <td className="p-4 font-semibold text-slate-800 tracking-tight">{emp.name}</td>
+                  <td className="p-4 text-slate-600">{emp.department}</td>
+                  <td className="p-4">
+                    {emp.face_descriptor ? (
+                      <span className="badge badge-success">
+                        Registered
+                      </span>
+                    ) : (
+                      <span className="badge badge-error">
+                        Missing
+                      </span>
+                    )}
+                  </td>
+                  <td className="p-4 text-right space-x-2">
+                    <button
+                      onClick={() => setSelectedEmployee(emp)}
+                      className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-[var(--primary-light)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white transition-colors"
+                    >
+                      Face Data
+                    </button>
+                    <button
+                      onClick={() => setEditEmployee(emp)}
+                      className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+                    >
+                      Edit 
+                    </button>
+                    <button
+                      onClick={() => deleteEmployee(emp.id)}
+                      className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-[var(--error)]/10 text-[var(--error)] hover:bg-[var(--error)] hover:text-white transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* ================= PAGINATION ================= */}
       {totalPages > 1 && (
-        <div className="flex justify-center gap-2 pt-4">
+        <div className="flex justify-center gap-2 pt-2">
           <button
             disabled={page === 1}
             onClick={() => goToPage(page - 1)}
-            className="px-3 py-1 border rounded disabled:opacity-40"
+            className="px-4 py-2 border border-slate-200 bg-[var(--glass-bg)] rounded-xl font-medium text-sm text-slate-600 shadow-sm hover:bg-slate-50 transition-colors disabled:opacity-40"
           >
             Prev
           </button>
@@ -204,10 +213,10 @@ export default function EmployeesPage() {
             <button
               key={i}
               onClick={() => goToPage(i + 1)}
-              className={`px-3 py-1 rounded ${
+              className={`px-4 py-2 rounded-xl text-sm font-semibold shadow-sm transition-colors ${
                 page === i + 1
-                  ? "bg-blue-600 text-white"
-                  : "border"
+                  ? "bg-[var(--primary)] text-white"
+                  : "border border-slate-200 bg-[var(--glass-bg)] text-slate-600 hover:bg-slate-50"
               }`}
             >
               {i + 1}
@@ -217,7 +226,7 @@ export default function EmployeesPage() {
           <button
             disabled={page === totalPages}
             onClick={() => goToPage(page + 1)}
-            className="px-3 py-1 border rounded disabled:opacity-40"
+            className="px-4 py-2 border border-slate-200 bg-[var(--glass-bg)] rounded-xl font-medium text-sm text-slate-600 shadow-sm hover:bg-slate-50 transition-colors disabled:opacity-40"
           >
             Next
           </button>

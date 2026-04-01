@@ -126,14 +126,14 @@ export default function FaceRegister({
   /* ---------- UI ---------- */
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center px-4">
-      <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-6 space-y-4">
+      <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8 space-y-5">
         {/* Header */}
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">
-            Face Registration
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+            Register Face Data
           </h2>
-          <p className="text-sm text-gray-500">
-            Employee: <span className="font-medium">{employee.name}</span>
+          <p className="text-sm text-slate-500 font-medium mt-1">
+            Employee: <span className="font-bold text-[var(--primary)]">{employee.name}</span>
           </p>
         </div>
 
@@ -159,14 +159,14 @@ export default function FaceRegister({
         />
 
         {/* Actions */}
-        <div className="flex gap-3 pt-2">
+        <div className="flex gap-3 pt-4">
           <button
             onClick={registerFace}
             disabled={loading || !modelsReady}
-            className={`flex-1 py-2 rounded-lg font-medium transition ${
+            className={`flex-1 btn btn-primary py-3 rounded-xl font-semibold shadow-sm ${
               loading || !modelsReady
-                ? "bg-gray-400 cursor-not-allowed text-white"
-                : "bg-blue-600 hover:bg-blue-700 text-white"
+                ? "opacity-60 cursor-not-allowed"
+                : ""
             }`}
           >
             {loading ? "Processing…" : "Capture Face"}
@@ -175,7 +175,7 @@ export default function FaceRegister({
           <button
             onClick={onClose}
             disabled={loading}
-            className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
+            className="px-5 py-3 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold transition-colors"
           >
             Cancel
           </button>

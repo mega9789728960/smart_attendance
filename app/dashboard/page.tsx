@@ -50,9 +50,9 @@ function StatCard({
   color: string;
 }) {
   return (
-    <div className="bg-white rounded-xl shadow border p-5">
-      <p className="text-sm font-medium text-gray-700">{title}</p>
-      <p className={`mt-2 text-3xl font-bold ${color}`}>{value}</p>
+    <div className="card p-6 flex flex-col justify-center">
+      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{title}</p>
+      <p className={`mt-2 text-3xl font-bold tracking-tight ${color}`}>{value}</p>
     </div>
   );
 }
@@ -61,22 +61,20 @@ function StatCard({
 function StatusBadge({ remark }: { remark: string | null }) {
   if (!remark)
     return (
-      <span className="px-2 py-1 text-xs rounded bg-gray-200 text-gray-800">
+      <span className="badge bg-slate-100 text-slate-500">
         —
       </span>
     );
 
-  const base = "px-2 py-1 rounded text-xs font-semibold";
-
   switch (remark) {
     case "On Time":
-      return <span className={`${base} bg-green-100 text-green-800`}>On Time</span>;
+      return <span className="badge badge-success">On Time</span>;
     case "Late Entry":
-      return <span className={`${base} bg-yellow-100 text-yellow-800`}>Late</span>;
+      return <span className="badge badge-warning">Late</span>;
     case "Half Day":
-      return <span className={`${base} bg-orange-100 text-orange-800`}>Half Day</span>;
+      return <span className="badge badge-error">Half Day</span>;
     default:
-      return <span className={`${base} bg-gray-100 text-gray-800`}>{remark}</span>;
+      return <span className="badge badge-primary">{remark}</span>;
   }
 }
 
@@ -213,79 +211,91 @@ export default function DashboardPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 px-4 py-6 pb-28">
-        <div className="max-w-7xl mx-auto space-y-6">
+      <div className="pb-28">
+        <div className="max-w-7xl mx-auto space-y-8">
 
           {/* HEADER */}
-          <div className="rounded-2xl bg-linear-to-r from-blue-600 to-indigo-600 p-6 shadow">
-            <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
-            <p className="text-blue-100 text-sm mt-1">
-              Today’s attendance overview
+          <div className="rounded-2xl bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)] p-8 shadow-lg text-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+            <h1 className="text-3xl font-bold tracking-tight relative z-10">Admin Dashboard</h1>
+            <p className="text-[var(--primary-light)] text-sm mt-1.5 font-medium relative z-10">
+              Today’s attendance overview and department metrics
             </p>
           </div>
 
           {/* STATS */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <StatCard title="Total Employees" value={String(totalEmployees)} color="text-gray-900" />
-            <StatCard title="Present Today" value={String(presentToday)} color="text-green-600" />
-            <StatCard title="Late Entries" value={String(lateToday)} color="text-yellow-600" />
-            <StatCard title="Half Day" value={String(halfDayToday)} color="text-orange-600" />
-            <StatCard title="Absent Today" value={String(absentToday)} color="text-red-600" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+            <StatCard title="Total Employees" value={String(totalEmployees)} color="text-[var(--primary)]" />
+            <StatCard title="Present Today" value={String(presentToday)} color="text-[var(--success)]" />
+            <StatCard title="Late Entries" value={String(lateToday)} color="text-[var(--warning)]" />
+            <StatCard title="Half Day" value={String(halfDayToday)} color="text-[var(--error)]" />
+            <StatCard title="Absent Today" value={String(absentToday)} color="text-slate-500" />
           </div>
 
-          {/* DEPARTMENT CHART */}
-          <div className="bg-white rounded-xl shadow-md p-4">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">
-              Department‑wise Present vs Absent
-            </h2>
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            {/* DEPARTMENT CHART */}
+            <div className="card p-6 xl:col-span-1">
+              <h2 className="text-lg font-bold text-slate-800 mb-6 tracking-tight">
+                Department Activity
+              </h2>
 
-            <Bar
-              data={chartData}
-              options={{
-                responsive: true,
-                plugins: { legend: { position: "top" } },
-                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
-              }}
-            />
-          </div>
-
-          {/* TABLE */}
-          <div className="bg-white rounded-xl shadow-md p-4">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">
-              Today’s Attendance
-            </h2>
-
-            <div className="overflow-x-auto">
-              <table className="w-full border border-gray-300 rounded-lg overflow-hidden">
-                <thead className="bg-blue-100 text-blue-900 text-sm font-semibold">
-                  <tr>
-                    <th className="p-3 text-left">EMP ID</th>
-                    <th className="p-3 text-left">Name</th>
-                    <th className="p-3 text-left">Time</th>
-                    <th className="p-3 text-left">Status</th>
-                    <th className="p-3 text-left">Remark</th>
-                  </tr>
-                </thead>
-                <tbody className="text-sm text-gray-900">
-                  {todayAttendance.map((row) => (
-                    <tr key={row.id} className="border-t hover:bg-gray-50">
-                      <td className="p-3 font-medium">{row.employee_id}</td>
-                      <td className="p-3 font-medium">{row.employee_name}</td>
-                      <td className="p-3">{formatTime(row.punch_in)}</td>
-                      <td className="p-3">
-                        <span className="px-2 py-1 text-xs rounded bg-green-100 text-green-800">
-                          Present
-                        </span>
-                      </td>
-                      <td className="p-3">
-                        <StatusBadge remark={row.remark} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <Bar
+                data={chartData}
+                options={{
+                  responsive: true,
+                  plugins: { legend: { position: "top" } },
+                  scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+                }}
+              />
             </div>
 
+            {/* TABLE */}
+            <div className="card p-6 xl:col-span-2">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-bold text-slate-800 tracking-tight">
+                  Today’s Attendance
+                </h2>
+              </div>
+
+              <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <table className="w-full text-left border-collapse">
+                  <thead className="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                      <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">EMP ID</th>
+                      <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Name</th>
+                      <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Time</th>
+                      <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
+                      <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Remark</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-sm">
+                    {todayAttendance.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="p-8 text-center text-slate-500">
+                          No attendance records for today.
+                        </td>
+                      </tr>
+                    ) : (
+                      todayAttendance.map((row) => (
+                        <tr key={row.id} className="border-b border-slate-100/60 hover:bg-slate-50/50 transition-colors last:border-0">
+                          <td className="p-4 font-semibold text-slate-700">{row.employee_id}</td>
+                          <td className="p-4 font-medium text-slate-900">{row.employee_name}</td>
+                          <td className="p-4 text-slate-600 font-medium">{formatTime(row.punch_in)}</td>
+                          <td className="p-4">
+                            <span className="badge badge-success">
+                              Present
+                            </span>
+                          </td>
+                          <td className="p-4">
+                            <StatusBadge remark={row.remark} />
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>

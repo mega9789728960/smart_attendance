@@ -16,53 +16,59 @@ export default function LoginPage() {
     }
     setLoading(false);
   }
-
   return (
-    <main className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-600 to-blue-400 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
-        <div className="text-center mb-6">
-          <div className="text-4xl mb-2">🧠</div>
-          <h1 className="text-2xl font-bold text-gray-800">
-            Smart Attendance
+    <main className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-slate-50">
+      {/* Decorative background gradients */}
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[var(--primary)]/5 to-transparent pointer-events-none" />
+      <div className="absolute -top-40 -right-40 w-96 h-96 bg-[var(--primary)]/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-[var(--success)]/10 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="w-full max-w-md card bg-white/90 space-y-6 relative z-10 p-8">
+        <div className="text-center">
+          <div className="flex justify-center mb-6">
+            <img src="/logo.png" alt="Logo" className="w-[120px] h-[120px] object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.1)] transition-transform hover:scale-105 duration-300" />
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+            Smart<span className="text-[var(--primary)]">Attendance</span>
           </h1>
-          <p className="text-sm text-gray-500">
-            Admin / Employee Login
+          <p className="text-sm font-medium text-slate-500 mt-2">
+            Secure Admin & Emloyee Portal
           </p>
         </div>
 
         {errorMsg && (
-          <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-lg text-sm text-center">
+          <div className="bg-[var(--error)]/10 border border-[var(--error)]/20 text-[var(--error)] p-3 rounded-xl text-sm font-semibold text-center shadow-sm">
             {errorMsg}
           </div>
         )}
 
-        <form action={clientAction}>
-          <div className="mb-4">
-            <label className="text-sm text-gray-600">Email</label>
+        <form action={clientAction} className="space-y-4">
+          <div>
             <input
               name="email"
               type="email"
+              placeholder="Email Address"
               required
-              className="mt-1 w-full border rounded-lg px-4 py-2"
+              className="w-full bg-white border border-slate-300/80 rounded-xl px-5 py-4 text-base font-medium focus:ring-2 focus:ring-[var(--primary)]/40 focus:border-[var(--primary)] outline-none transition-all placeholder-slate-400 text-slate-900 shadow-sm"
             />
           </div>
 
-          <div className="mb-6">
-            <label className="text-sm text-gray-600">Password</label>
+          <div>
             <input
               name="password"
               type="password"
+              placeholder="Password"
               required
-              className="mt-1 w-full border rounded-lg px-4 py-2"
+              className="w-full bg-white border border-slate-300/80 rounded-xl px-5 py-4 text-base font-medium focus:ring-2 focus:ring-[var(--primary)]/40 focus:border-[var(--primary)] outline-none transition-all placeholder-slate-400 text-slate-900 shadow-sm"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold"
+            className={`btn btn-primary w-full py-3.5 text-base mt-2 shadow-sm ${loading ? 'opacity-70 cursor-wait' : ''}`}
           >
-            {loading ? "Signing in..." : "Login"}
+            {loading ? "Authenticating..." : "Sign In"}
           </button>
         </form>
       </div>

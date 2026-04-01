@@ -69,71 +69,86 @@ export default function EmployeeAttendancePage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-100 px-4 pt-6 pb-24">
-        <div className="max-w-4xl mx-auto">
+      <div className="pb-24">
+        <div className="max-w-4xl mx-auto space-y-8">
           {/* HEADER */}
-          <div className="mb-6 text-center">
-            <h1 className="text-2xl font-bold text-gray-900">
-              My Attendance
-            </h1>
-            <p className="text-gray-700 mt-1">
-              View your daily attendance history
-            </p>
+          <div className="rounded-2xl bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)] p-8 shadow-lg text-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10">
+              <h1 className="text-3xl font-bold tracking-tight">
+                My Attendance
+              </h1>
+              <p className="text-[var(--primary-light)] text-sm mt-1.5 font-medium">
+                View your daily attendance history
+              </p>
+            </div>
           </div>
 
           {/* FACE WARNING */}
           {!faceRegistered && !loading && (
-            <div className="mb-5 rounded-xl bg-yellow-100 border border-yellow-400 p-4 text-yellow-900 text-sm font-medium">
-              ⚠️ Face not registered.
-              <br />
-              Please contact admin to complete face registration.
+            <div className="mb-5 rounded-xl bg-[var(--warning)]/10 border border-[var(--warning)]/20 p-5 text-[var(--warning)] text-sm font-semibold flex items-start shadow-sm">
+              <span className="text-lg mr-3 leading-none">⚠️</span>
+              <div>
+                Face not registered.
+                <br className="my-1"/>
+                <span className="font-normal opacity-90">Please contact admin to complete face registration.</span>
+              </div>
             </div>
           )}
 
           {/* CONTENT CARD */}
-          <div className="bg-white rounded-xl shadow-md p-4">
+          <div className="card p-6">
             {loading && (
-              <p className="text-center text-gray-800 py-6 font-medium">
-                Loading attendance…
+              <p className="text-center text-slate-500 py-8 font-medium">
+                Loading attendance history…
               </p>
             )}
 
             {!loading && records.length === 0 && (
-              <p className="text-center text-gray-800 py-6 font-medium">
-                No attendance records found
-              </p>
+              <div className="text-center py-10">
+                <div className="text-4xl mb-3 opacity-50">📅</div>
+                <p className="text-slate-500 font-medium">
+                  No attendance records found
+                </p>
+              </div>
             )}
 
             {!loading && records.length > 0 && (
-              <div className="overflow-x-auto">
-                <table className="w-full border border-gray-300 rounded-lg overflow-hidden">
-                  <thead className="bg-blue-100 text-blue-900 text-sm font-semibold">
+              <div className="border border-slate-200 rounded-xl overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead className="bg-slate-50 border-b border-slate-200">
                     <tr>
-                      <th className="p-3 text-left">Date</th>
-                      <th className="p-3 text-left">Punch In</th>
-                      <th className="p-3 text-left">Status</th>
-                      <th className="p-3 text-left">Remark</th>
+                      <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Date</th>
+                      <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Punch In</th>
+                      <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
+                      <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Remark</th>
                     </tr>
                   </thead>
-                  <tbody className="text-sm text-gray-900">
+                  <tbody className="text-sm">
                     {records.map((r) => (
                       <tr
                         key={r.id}
-                        className="border-t hover:bg-gray-50"
+                        className="border-b border-slate-100/60 hover:bg-slate-50/50 transition-colors last:border-0"
                       >
-                        <td className="p-3 font-medium">
-                          {r.date}
+                        <td className="p-4 font-semibold text-slate-700">
+                          {new Date(r.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </td>
-                        <td className="p-3">
+                        <td className="p-4 text-slate-600 font-medium">
                           {r.punch_in
-                            ? new Date(r.punch_in).toLocaleTimeString()
+                            ? new Date(r.punch_in).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
                             : "—"}
                         </td>
-                        <td className="p-3 font-semibold capitalize">
-                          {r.status ?? "—"}
+                        <td className="p-4">
+                          <span className="badge badge-success capitalize">
+                            {r.status ?? "—"}
+                          </span>
                         </td>
-                        <td className="p-3">
-                          {r.remark ?? "—"}
+                        <td className="p-4">
+                          {r.remark ? (
+                            <span className="badge badge-primary">{r.remark}</span>
+                          ) : (
+                            <span className="text-slate-400">—</span>
+                          )}
                         </td>
                       </tr>
                     ))}

@@ -13,51 +13,42 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="w-64 bg-black text-white min-h-screen p-6 flex flex-col">
-      <h1 className="text-xl font-bold mb-8">
-        Smart Attendance
-      </h1>
+    <div className="w-full h-full p-6 flex flex-col space-y-2">
+      <div className="flex items-center gap-3 mb-10 px-2 mt-4">
+        <img src="/logo.png" alt="Logo" className="w-[48px] h-[48px] object-contain drop-shadow-sm" />
+        <h1 className="text-xl font-bold tracking-tight leading-tight">
+          Smart<br/>Attendance
+        </h1>
+      </div>
 
-      <nav className="space-y-3 text-sm flex-1">
+      <nav className="space-y-2 text-sm flex-1">
         {/* ADMIN */}
-        <p className="text-gray-400 uppercase text-xs mt-4">Admin</p>
+        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-6 mb-3 px-2">Admin Panel</p>
 
-        <Link href="/dashboard" className="block hover:text-gray-300">
+        <Link href="/dashboard" className="block">
           Dashboard
         </Link>
 
-        <Link href="/dashboard/attendance" className="block hover:text-gray-300">
+        <Link href="/dashboard/attendance" className="block">
           Attendance
         </Link>
 
-        <Link href="/employees" className="block hover:text-gray-300">
+        <Link href="/employees" className="block">
           Employees
         </Link>
-        <Link href="/register" className="block hover:text-gray-300">
-                     
-                      Register
-           </Link>
-        
 
-        {/* EMPLOYEE
-        <p className="text-gray-400 uppercase text-xs mt-6">Employee</p>
-
-        <Link href="/employee/attendance" className="block hover:text-gray-300">
-          My Attendance
+        <Link href="/register" className="block">
+          Register
         </Link>
-
-        <Link href="/employee/profile" className="block hover:text-gray-300">
-          My Profile
-        </Link> */}
       </nav>
 
       {/* LOGOUT */}
       <button
         onClick={handleLogout}
-        className="mt-6 w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg text-sm font-semibold"
+        className="mt-6 w-full text-slate-300 hover:text-white bg-slate-800 hover:bg-[var(--error)] py-3 rounded-xl text-sm font-semibold transition-colors duration-200"
       >
         Logout
       </button>
-    </aside>
+    </div>
   );
 }

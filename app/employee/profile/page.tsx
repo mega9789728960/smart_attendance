@@ -54,27 +54,34 @@ export default function EmployeeProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-6 pb-24">
-      <div className="max-w-md mx-auto bg-white rounded-2xl shadow p-6 space-y-4">
-        <h1 className="text-2xl font-bold text-blue-700 text-center">
-          My Profile
-        </h1>
+    <div className="px-4 py-8 pb-24">
+      <div className="max-w-md mx-auto card p-8 space-y-6">
+        <div className="text-center pb-4 border-b border-slate-100">
+          <div className="mx-auto w-20 h-20 bg-[var(--primary-light)] text-[var(--primary)] rounded-full flex items-center justify-center mb-4 shadow-sm">
+             <span className="text-4xl drop-shadow-sm">🧑‍💼</span>
+          </div>
+          <h1 className="text-2xl font-bold text-[var(--primary)] tracking-tight">
+            My Profile
+          </h1>
+        </div>
 
         {loading && (
-          <p className="text-center text-gray-500">Loading profile…</p>
+          <p className="text-center text-slate-500 py-4 font-medium animate-pulse">Loading profile…</p>
         )}
 
         {error && (
-          <p className="text-center text-red-600">{error}</p>
+          <div className="bg-[var(--error)]/10 text-[var(--error)] p-3 rounded-lg text-sm text-center font-semibold border border-[var(--error)]/20 shadow-sm">
+            {error}
+          </div>
         )}
 
         {employee && (
-          <div className="space-y-3 text-sm">
+          <div className="space-y-4 text-sm mt-4">
             <ProfileRow label="Employee ID" value={employee.employee_id} />
             <ProfileRow label="Name" value={employee.name} />
             <ProfileRow label="Email" value={employee.email} />
             <ProfileRow label="Department" value={employee.department} />
-            <ProfileRow label="Role" value={employee.role} />
+            <ProfileRow label="Role" value={employee.role} isRole={true} />
           </div>
         )}
       </div>
@@ -88,14 +95,20 @@ export default function EmployeeProfilePage() {
 function ProfileRow({
   label,
   value,
+  isRole = false
 }: {
   label: string;
   value: string;
+  isRole?: boolean;
 }) {
   return (
-    <div className="flex justify-between border-b pb-2">
-      <span className="text-gray-500">{label}</span>
-      <span className="font-medium text-gray-900">{value}</span>
+    <div className="flex justify-between items-center py-3 border-b border-slate-100 last:border-0">
+      <span className="text-slate-500 font-medium">{label}</span>
+      {isRole ? (
+        <span className="badge badge-primary uppercase text-[10px] tracking-widest">{value}</span>
+      ) : (
+        <span className="font-bold text-slate-800 tracking-tight">{value}</span>
+      )}
     </div>
   );
 }

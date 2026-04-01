@@ -26,7 +26,13 @@ export default function RegisterPage() {
 
     if (!data?.employee_id) return "EMP001";
 
-    const last = parseInt(data.employee_id.replace("EMP", ""), 10);
+    const match = data.employee_id.match(/\d+/);
+    if (!match) {
+      // Fallback if the previous row has no numbers in the ID (e.g. "EMPNaN", "Admin")
+      return `EMP${Math.floor(Math.random() * 900) + 100}`;
+    }
+
+    const last = parseInt(match[0], 10);
     return `EMP${String(last + 1).padStart(3, "0")}`;
   }
 
@@ -61,7 +67,8 @@ export default function RegisterPage() {
     setLoading(false);
 
     if (empError) {
-      alert("Employee creation failed");
+      console.error("Employee insert failed:", empError);
+      alert(`Employee creation failed: ${empError.message}`);
       return;
     }
 
@@ -72,26 +79,33 @@ export default function RegisterPage() {
   /* ---------- SUCCESS SCREEN ---------- */
   if (success) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 text-center">
-          <h1 className="text-2xl font-bold text-green-600 mb-3">
-            Registration Successful 🎉
-          </h1>
+      <main className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-slate-50">
+        <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-bl from-[var(--success)]/10 to-transparent pointer-events-none" />
+        <div className="w-full max-w-md card bg-white/90 text-center p-10 relative z-10 space-y-6">
+          <div className="mx-auto w-20 h-20 bg-[var(--success)]/10 text-[var(--success)] rounded-full flex items-center justify-center shadow-sm">
+            <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+          </div>
+          
+          <div>
+            <h1 className="text-2xl font-bold text-[var(--success)] mb-1 tracking-tight">
+              Registration Successful
+            </h1>
+            <p className="text-slate-500 text-sm font-medium">Your Employee Profile is ready.</p>
+          </div>
 
-          <p className="text-gray-700 mb-2">Your Employee ID</p>
-
-          <p className="text-xl font-mono font-bold text-gray-900 mb-6">
-            {generatedEmployeeId}
-          </p>
-
-          <p className="text-sm text-gray-600 mb-6">
-            Please contact the admin to register your face before marking
-            attendance.
-          </p>
+          <div className="p-5 bg-amber-50 rounded-2xl border border-amber-200 text-left flex items-start shadow-sm mt-8">
+            <span className="mr-4 text-3xl leading-none drop-shadow-sm pb-1">⚠️</span>
+            <div>
+              <p className="text-sm text-amber-900 font-extrabold mb-1 uppercase tracking-wide">Action Required</p>
+              <p className="text-[13px] text-amber-800 font-semibold leading-relaxed">
+                Please register your face by contacting your Admin before you can punch attendance.
+              </p>
+            </div>
+          </div>
 
           <button
             onClick={() => router.replace("/login")}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold"
+            className="btn btn-primary w-full py-3.5 text-base"
           >
             Go to Login
           </button>
@@ -102,54 +116,56 @@ export default function RegisterPage() {
 
   /* ---------- REGISTER FORM ---------- */
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
-        <h1 className="text-2xl font-bold text-center text-gray-900 mb-6">
-          Employee Registration
-        </h1>
+    <main className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-slate-50">
+      {/* Decorative */}
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[var(--primary)]/5 to-transparent pointer-events-none" />
+      <div className="absolute -top-40 right-0 w-96 h-96 bg-[var(--primary)]/10 rounded-full blur-[100px] pointer-events-none" />
 
-        <div className="space-y-4">
+      <div className="w-full max-w-md card bg-white/90 relative z-10 p-8">
+        <div className="text-center mb-6">
+          <div className="flex justify-center mb-5">
+            <img src="/logo.png" alt="Logo" className="w-[120px] h-[120px] object-contain drop-shadow-sm transition-transform hover:scale-105 duration-300" />
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            Create Account
+          </h1>
+          <p className="text-sm text-slate-500 mt-1 font-medium">Register a new employee profile</p>
+        </div>
+
+        <div className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Full Name
-            </label>
             <input
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-900 focus:ring-2 focus:ring-blue-500"
+              placeholder="Full Name"
+              className="w-full border border-slate-300/80 rounded-xl px-5 py-4 text-base font-medium focus:ring-2 focus:ring-[var(--primary)]/40 outline-none transition-all placeholder-slate-400 bg-white shadow-sm text-slate-900"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
             <input
               type="email"
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-900 focus:ring-2 focus:ring-blue-500"
+              placeholder="Email Address"
+              className="w-full border border-slate-300/80 rounded-xl px-5 py-4 text-base font-medium focus:ring-2 focus:ring-[var(--primary)]/40 outline-none transition-all placeholder-slate-400 bg-white shadow-sm text-slate-900"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Department
-            </label>
             <input
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-900 focus:ring-2 focus:ring-blue-500"
+              placeholder="Department (e.g., Engineering)"
+              className="w-full border border-slate-300/80 rounded-xl px-5 py-4 text-base font-medium focus:ring-2 focus:ring-[var(--primary)]/40 outline-none transition-all placeholder-slate-400 bg-white shadow-sm text-slate-900"
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
             <input
               type="password"
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-900 focus:ring-2 focus:ring-blue-500"
+              placeholder="Password"
+              className="w-full border border-slate-300/80 rounded-xl px-5 py-4 text-base font-medium focus:ring-2 focus:ring-[var(--primary)]/40 outline-none transition-all placeholder-slate-400 bg-white shadow-sm text-slate-900"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -158,9 +174,9 @@ export default function RegisterPage() {
           <button
             onClick={handleRegister}
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition"
+            className={`btn btn-primary w-full py-3.5 text-base mt-2 transition-all ${loading ? 'opacity-70 cursor-wait' : ''}`}
           >
-            {loading ? "Creating Account..." : "Register"}
+            {loading ? "Creating Profile..." : "Register Employee"}
           </button>
         </div>
       </div>

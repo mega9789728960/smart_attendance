@@ -57,80 +57,94 @@ export default function AdminAttendancePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 px-4 py-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="pb-28">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* HEADER */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-slate-900">
-            Attendance History
-          </h1>
-          <p className="text-sm text-slate-600">
-            Daily employee punch-in records
-          </p>
+        <div className="rounded-2xl bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)] p-8 shadow-lg text-white relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative z-10">
+            <h1 className="text-3xl font-bold tracking-tight">
+              Attendance Log
+            </h1>
+            <p className="text-[var(--primary-light)] text-sm mt-1.5 font-medium">
+              Daily employee punch-in records across the organization
+            </p>
+          </div>
+          <div className="relative z-10 bg-white/20 backdrop-blur-md px-5 py-2.5 rounded-xl border border-white/30 flex items-center gap-2 shadow-sm self-start md:self-auto">
+            <span className="text-sm font-semibold text-white/90">RECORDS</span>
+            <span className="text-2xl font-bold tracking-tight">{rows.length}</span>
+          </div>
         </div>
 
-        {/* STATES */}
-        {loading && (
-          <p className="text-slate-600 font-medium">Loading attendance…</p>
-        )}
+        <div className="card p-6 min-h-[400px]">
+          {/* STATES */}
+          {loading && (
+            <div className="text-center py-20 flex flex-col items-center">
+              <div className="w-8 h-8 border-4 border-[var(--primary)]/30 border-t-[var(--primary)] rounded-full animate-spin mb-4"></div>
+              <p className="text-slate-500 font-medium">Loading attendance data…</p>
+            </div>
+          )}
 
-        {!loading && rows.length === 0 && (
-          <p className="text-slate-600 font-medium">
-            No attendance records found
-          </p>
-        )}
+          {!loading && rows.length === 0 && (
+            <div className="text-center py-20 flex flex-col items-center">
+              <div className="text-5xl mb-4 opacity-50">📋</div>
+              <p className="text-slate-500 font-medium text-lg">
+                No attendance records found
+              </p>
+            </div>
+          )}
 
-        {/* TABLE */}
-        {!loading && rows.length > 0 && (
-          <div className="overflow-x-auto bg-white rounded-xl shadow-md border border-slate-200">
-            <table className="w-full text-sm sm:text-base">
-              <thead className="bg-slate-200 text-slate-900">
-                <tr>
-                  <th className="px-4 py-3 text-left font-semibold">Date</th>
-                  <th className="px-4 py-3 text-left font-semibold">Employee</th>
-                  <th className="px-4 py-3 text-left font-semibold">
-                    Punch In
-                  </th>
-                  <th className="px-4 py-3 text-left font-semibold">Status</th>
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-slate-200">
-                {rows.map((r) => (
-                  <tr
-                    key={r.id}
-                    className="hover:bg-slate-50 transition"
-                  >
-                    <td className="px-4 py-3 text-slate-900 font-medium">
-                      {new Date(r.date).toLocaleDateString()}
-                    </td>
-
-                    <td className="px-4 py-3 text-slate-900">
-                      <div className="font-semibold">
-                        {r.employeeName}
-                      </div>
-                      <div className="text-xs text-slate-600">
-                        {r.employee_id}
-                      </div>
-                    </td>
-
-                    <td className="px-4 py-3 text-slate-900 font-medium">
-                      {r.punch_in
-                        ? new Date(r.punch_in).toLocaleTimeString()
-                        : "-"}
-                    </td>
-
-                    <td className="px-4 py-3">
-                      <span className="inline-block px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-semibold">
-                        Present
-                      </span>
-                    </td>
+          {/* TABLE */}
+          {!loading && rows.length > 0 && (
+            <div className="overflow-x-auto rounded-xl border border-slate-200">
+              <table className="w-full text-left border-collapse">
+                <thead className="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Date</th>
+                    <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Employee</th>
+                    <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Time</th>
+                    <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                </thead>
+
+                <tbody className="text-sm">
+                  {rows.map((r) => (
+                    <tr
+                      key={r.id}
+                      className="border-b border-slate-100/60 hover:bg-slate-50/50 transition-colors last:border-0"
+                    >
+                      <td className="p-4 text-slate-900 font-semibold whitespace-nowrap">
+                        {new Date(r.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                      </td>
+
+                      <td className="p-4 text-slate-900">
+                        <div className="font-bold tracking-tight">
+                          {r.employeeName}
+                        </div>
+                        <div className="text-xs text-slate-500 font-mono mt-0.5">
+                          {r.employee_id}
+                        </div>
+                      </td>
+
+                      <td className="p-4 text-slate-600 font-medium whitespace-nowrap">
+                        {r.punch_in
+                          ? new Date(r.punch_in).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })
+                          : "—"}
+                      </td>
+
+                      <td className="p-4 whitespace-nowrap">
+                        {/* Always present in this dataset since standard punches only create 'present' lines; we can just render the badge */}
+                        <span className="badge badge-success shadow-sm">
+                          Present
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
