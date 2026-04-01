@@ -194,7 +194,7 @@ export default function Attendance() {
         );
 
         if (distance > ALLOWED_RADIUS) {
-          setStatus(`❌ Outside allowed area (Dist: ${Math.round(distance)}m)`);
+          setStatus(`❌ Outside allowed area (Dist: ${Math.round(distance)}m). Your Pos: LAT ${latitude}, LNG ${longitude}`);
           setLoading(false);
           setPunchAction(null);
           return;
@@ -210,9 +210,9 @@ export default function Attendance() {
         setPunchAction(null);
       },
       {
-        enableHighAccuracy: false, // GPS can timeout indoors. Setting to false uses faster Wi-Fi/Cellular signals
-        timeout: 30000,            // Give it 30 seconds instead of 15 seconds
-        maximumAge: 10000,         // Allow locations cached in the last 10 seconds to speed it up
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0,
       }
     );
   }
