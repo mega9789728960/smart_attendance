@@ -17,7 +17,7 @@ const CAMPUS_LNG = 77.24349695299837;
 // const CAMPUS_LAT = 11.0765000;
 // const CAMPUS_LNG = 77.1420000;
 
-const ALLOWED_RADIUS = 200; // meters
+const ALLOWED_RADIUS = 2000; // meters
 
 // ✅ ATTENDANCE RULES
 const OFFICE_START_TIME = "09:30";
@@ -123,16 +123,21 @@ export default function Attendance() {
       return;
     }
 
-    // 2. Get employee record by email
+    // 2. Get employee record by email and role
     const { data: employee, error } = await supabase
       .from("employees")
-      .select("employee_id, face_descriptor")
+      .select("employee_id, face_descriptor, role")
       .eq("email", user.email)
       .single();
 
     if (error || !employee) {
       setStatus("❌ Employee record not found for your account.");
       setLoading(false);
+      return;
+    }
+
+    if (employee.role === "admin") {
+      window.location.replace("/dashboard");
       return;
     }
 

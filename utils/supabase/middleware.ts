@@ -48,7 +48,7 @@ export async function updateSession(request: NextRequest) {
       return supabaseResponse
     }
     const url = request.nextUrl.clone()
-    url.pathname = '/attendance' // Default redirect after login
+    url.pathname = '/dashboard' // Send to dashboard, which safely re-routes employees
     return NextResponse.redirect(url)
   }
 
