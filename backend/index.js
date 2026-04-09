@@ -9,8 +9,8 @@ require('dotenv').config();
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'benmega500@gmail.com',
-    pass: 'yuvbbzmubmgvhczd'
+    user: process.env.SMTP_EMAIL,
+    pass: process.env.SMTP_PASSWORD
   }
 });
 
@@ -57,7 +57,7 @@ app.post('/api/auth/register-send-otp', async (req, res) => {
     );
 
     const mailOptions = {
-      from: 'benmega500@gmail.com',
+      from: process.env.SMTP_EMAIL,
       to: email,
       subject: 'Registration Verification OTP',
       text: `Your OTP for confirming your registration is: ${otp}. It will expire in 15 minutes.`
@@ -210,7 +210,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     );
 
     const mailOptions = {
-      from: 'benmega500@gmail.com',
+      from: process.env.SMTP_EMAIL,
       to: email,
       subject: 'Password Reset OTP',
       text: `Your OTP for password reset is: ${otp}. It will expire in 15 minutes.`
