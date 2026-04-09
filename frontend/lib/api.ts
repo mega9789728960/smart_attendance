@@ -1,4 +1,5 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+// Fall back to live API if not explicitly set in Vercel environment variables
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://smart-attendance-ri3r.vercel.app';
 
 export function getToken(): string | null {
   if (typeof window === 'undefined') return null;
