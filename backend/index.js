@@ -429,6 +429,40 @@ app.get('/api/employees/verify', async (req, res) => {
 
 // ─────────────────────────── ATTENDANCE ───────────────────────────
 
+// Verify location
+app.post('/api/attendance/verify-location', authenticateToken, (req, res) => {
+  try {
+    const { latitude, longitude } = req.body;
+    if (!latitude || !longitude) {
+      return res.status(400).json({ error: "Missing GPS coordinates" });
+    }
+
+    const CAMPUS_LAT = 11.503639884280672;
+    const CAMPUS_LNG = 77.24349695299837;
+    const ALLOWED_RADIUS = 2000; // meters
+
+    const R = 6371000;
+    const dLat = ((CAMPUS_LAT - latitude) * Math.PI) / 180;
+    const dLon = ((CAMPUS_LNG - longitude) * Math.PI) / 180;
+
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos((latitude * Math.PI) / 180) *
+      Math.cos((CAMPUS_LAT * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2;
+
+    const distance = R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+
+    if (distance > ALLOWED_RADIUS) {
+      return res.status(403).json({ error: `Outside allowed area (Dist: ${Math.round(distance)}m). Your Pos: LAT ${latitude}, LNG ${longitude}` });
+    }
+
+    res.json({ success: true, message: "Location verified" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Punch in
 app.post('/api/attendance/punch-in', authenticateToken, async (req, res) => {
   try {
