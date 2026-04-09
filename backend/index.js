@@ -437,9 +437,10 @@ app.post('/api/attendance/verify-location', authenticateToken, (req, res) => {
       return res.status(400).json({ error: "Missing GPS coordinates" });
     }
 
-    const CAMPUS_LAT =  10.915140679069458;
-    const CAMPUS_LNG = 78.02292393610243;
+   
 
+    const CAMPUS_LAT = 11.503639884280672;
+    const CAMPUS_LNG = 77.24349695299837;
   
     const ALLOWED_RADIUS = 2000; // meters
 
