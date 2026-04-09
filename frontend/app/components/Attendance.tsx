@@ -5,30 +5,8 @@ import { apiFetch, getToken, getStoredUser } from "@/lib/api";
 import FaceCapture from "@/app/components/FaceCapture";
 
 /* ---------- CONFIG ---------- */
-const CAMPUS_LAT = 11.513944566899058;
-const CAMPUS_LNG = 77.24670983047233;
-const ALLOWED_RADIUS = 2000;
 
 /* ---------- HELPERS ---------- */
-function getDistanceInMeters(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-) {
-  const R = 6371000;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) ** 2;
-
-  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
-}
-
 function faceDistance(a: number[], b: number[]) {
   return Math.sqrt(a.reduce((sum, val, i) => sum + (val - b[i]) ** 2, 0));
 }
@@ -99,15 +77,16 @@ export default function Attendance({ disabled = false }: AttendanceProps) {
 
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        const d = getDistanceInMeters(
-          pos.coords.latitude,
-          pos.coords.longitude,
-          CAMPUS_LAT,
-          CAMPUS_LNG
-        );
-
-        if (d > ALLOWED_RADIUS) {
-          setStatus("❌ Outside campus");
+        try {
+          await apiFetch('/api/attendance/verify-location', {
+            method: 'POST',
+            body: JSON.stringify({
+              latitude: pos.coords.latitude,
+              longitude: pos.coords.longitude
+            })
+          });
+        } catch (err: any) {
+          setStatus(`❌ ${err.message || 'Outside campus'}`);
           setLoading(false);
           return;
         }

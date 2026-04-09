@@ -8,12 +8,6 @@ import FaceRegister from "@/app/components/FaceRegister";
 import MobileBottomNav from "@/app/components/MobileBottomNav";
 
 /* ---------- CONFIG ---------- */
-//home:
-const CAMPUS_LAT = 11.503639884280672;
-const CAMPUS_LNG = 77.24349695299837;
-
-const ALLOWED_RADIUS = 2000; // meters
-
 // ✅ ATTENDANCE RULES
 const OFFICE_START_TIME = "09:30";
 const LATE_AFTER_TIME = "09:45";
@@ -36,25 +30,6 @@ function getAttendanceStatus(punchInTime: Date) {
   }
 
   return { status: "present", remark: "Late" };
-}
-
-function getDistanceInMeters(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-) {
-  const R = 6371000;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-    Math.cos((lat2 * Math.PI) / 180) *
-    Math.sin(dLon / 2) ** 2;
-
-  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 }
 
 function faceDistance(a: number[], b: number[]) {
@@ -183,15 +158,13 @@ export default function Attendance() {
       async (pos) => {
         const { latitude, longitude } = pos.coords;
 
-        const distance = getDistanceInMeters(
-          latitude,
-          longitude,
-          CAMPUS_LAT,
-          CAMPUS_LNG
-        );
-
-        if (distance > ALLOWED_RADIUS) {
-          setStatus(`❌ Outside allowed area (Dist: ${Math.round(distance)}m). Your Pos: LAT ${latitude}, LNG ${longitude}`);
+        try {
+          await apiFetch('/api/attendance/verify-location', {
+            method: 'POST',
+            body: JSON.stringify({ latitude, longitude })
+          });
+        } catch (err: any) {
+          setStatus(`❌ ${err.message || "Location verification failed"}`);
           setLoading(false);
           setPunchAction(null);
           return;
