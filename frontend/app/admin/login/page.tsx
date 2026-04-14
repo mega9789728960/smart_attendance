@@ -50,9 +50,7 @@ export default function AdminLoginPage() {
 
       <div className="w-full max-w-md card bg-slate-800/90 border border-slate-700 space-y-6 relative z-10 p-8 shadow-2xl">
         <div className="text-center">
-          <div className="flex justify-center mb-6">
-            <img src="/logo.png" alt="Logo" className="w-[100px] h-[100px] object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] transition-transform hover:scale-105 duration-300" />
-          </div>
+
           <h1 className="text-3xl font-bold tracking-tight text-white">
             Admin<span className="text-indigo-400">Portal</span>
           </h1>

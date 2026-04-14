@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiFetch, getToken } from "@/lib/api";
-import MobileBottomNav from "@/app/components/MobileBottomNav";
+
 
 type Employee = {
   employee_id: string;
@@ -80,8 +80,6 @@ export default function EmployeeProfilePage() {
           </div>
         )}
       </div>
-
-      <MobileBottomNav />
     </div>
   );
 }

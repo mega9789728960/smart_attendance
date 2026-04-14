@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Sidebar from "@/app/components/Sidebar";
+import EmployeeSidebar from "@/app/components/EmployeeSidebar";
 import { removeToken } from "@/lib/api";
 
-export default function DashboardLayout({
+export default function EmployeeLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -23,14 +23,14 @@ export default function DashboardLayout({
 
       {/* ================= DESKTOP SIDEBAR ================= */}
       <aside className="hidden md:flex sidebar">
-        <Sidebar />
+        <EmployeeSidebar />
       </aside>
 
       {/* ================= MOBILE SIDEBAR OVERLAY ================= */}
       {menuOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
           <aside className="sidebar">
-            <Sidebar />
+            <EmployeeSidebar />
           </aside>
 
           {/* Overlay */}

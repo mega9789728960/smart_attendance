@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiFetch, getToken, getStoredUser } from "@/lib/api";
+import { captureTelemetryData } from "@/lib/telemetry";
 import FaceCapture from "@/app/components/FaceCapture";
 
 /* ---------- CONFIG ---------- */
@@ -73,33 +74,23 @@ export default function Attendance({ disabled = false }: AttendanceProps) {
     }
 
     setLoading(true);
-    setStatus("📍 Checking location...");
+    setStatus("📍 Gathering telemetry and checking location...");
 
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        try {
-          await apiFetch('/api/attendance/verify-location', {
-            method: 'POST',
-            body: JSON.stringify({
-              latitude: pos.coords.latitude,
-              longitude: pos.coords.longitude
-            })
-          });
-        } catch (err: any) {
-          setStatus(`❌ ${err.message || 'Outside campus'}`);
-          setLoading(false);
-          return;
-        }
+    try {
+      const telemetry = await captureTelemetryData();
 
-        setShowFace(true);
-        setStatus("✅ Location verified. Verify face");
-        setLoading(false);
-      },
-      () => {
-        setStatus("❌ Location permission denied");
-        setLoading(false);
-      }
-    );
+      await apiFetch('/api/attendance/verify-location', {
+        method: 'POST',
+        body: JSON.stringify({ telemetry })
+      });
+
+      setShowFace(true);
+      setStatus("✅ Location verified. Verify face");
+      setLoading(false);
+    } catch (err: any) {
+      setStatus(`❌ ${err.message || 'Validation failed'}`);
+      setLoading(false);
+    }
   }
 
   /* ---------- Face Verify ---------- */

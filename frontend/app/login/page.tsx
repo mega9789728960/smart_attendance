@@ -33,7 +33,7 @@ export default function LoginPage() {
       setToken(data.token);
       setStoredUser(data.user);
 
-      router.replace("/attendance");
+      router.replace("/employee/dashboard");
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Login failed");
     }
@@ -50,9 +50,7 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md card bg-white/90 space-y-6 relative z-10 p-8">
         <div className="text-center">
-          <div className="flex justify-center mb-6">
-            <img src="/logo.png" alt="Logo" className="w-[120px] h-[120px] object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.1)] transition-transform hover:scale-105 duration-300" />
-          </div>
+
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">
             Smart<span className="text-[var(--primary)]">Attendance</span>
           </h1>

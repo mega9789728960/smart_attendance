@@ -60,7 +60,12 @@ export default function MobileBottomNav() {
         {/* ================= EMPLOYEE ================= */}
         {role === "employee" && (
           <>
-            <Link href="/attendance" className="flex flex-col items-center gap-1.5 transition-colors hover:text-[var(--primary)] active:scale-95">
+            <Link href="/employee/dashboard" className="flex flex-col items-center gap-1.5 transition-colors hover:text-[var(--primary)] active:scale-95">
+              <span className="text-2xl drop-shadow-sm">📊</span>
+              <span>Dashboard</span>
+            </Link>
+
+            <Link href="/employee/punch" className="flex flex-col items-center gap-1.5 transition-colors hover:text-[var(--primary)] active:scale-95">
               <span className="text-2xl drop-shadow-sm">🕒</span>
               <span>Punch</span>
             </Link>

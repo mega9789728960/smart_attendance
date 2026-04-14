@@ -10,7 +10,6 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 gap-2">
           {/* LOGO AND BRANDING */}
           <div className="flex items-center gap-2 sm:gap-4 text-xl sm:text-2xl font-bold tracking-tight text-slate-900 shrink-0">
-            <img src="/logo.png" alt="Logo" className="w-[60px] h-[60px] sm:w-[80px] sm:h-[80px] md:w-[100px] md:h-[100px] object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]" />
             <span className="hidden min-[400px]:inline-block">Smart <span className="text-[var(--primary)]">Attendance</span></span>
           </div>
 
@@ -169,7 +168,6 @@ export default function Home() {
       {/* ================= FOOTER ================= */}
       <footer className="py-12 text-center border-t border-slate-100 bg-white">
         <div className="flex items-center justify-center gap-3 text-2xl font-bold tracking-tight text-slate-900 mb-6 opacity-60 hover:opacity-100 transition-all">
-          <img src="/logo.png" alt="Logo" className="w-[60px] h-[60px] object-contain" />
           SmartAttendance
         </div>
         <p className="text-sm text-slate-400 font-medium">

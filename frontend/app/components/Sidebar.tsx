@@ -15,7 +15,6 @@ export default function Sidebar() {
   return (
     <div className="w-full h-full p-6 flex flex-col space-y-2">
       <div className="flex items-center gap-3 mb-10 px-2 mt-4">
-        <img src="/logo.png" alt="Logo" className="w-[48px] h-[48px] object-contain drop-shadow-sm" />
         <h1 className="text-xl font-bold tracking-tight leading-tight">
           Smart<br/>Attendance
         </h1>

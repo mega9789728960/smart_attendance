@@ -4,6 +4,7 @@ const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const { validateCheckIn } = require('./validation');
 require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
@@ -430,11 +431,34 @@ app.get('/api/employees/verify', async (req, res) => {
 // ─────────────────────────── ATTENDANCE ───────────────────────────
 
 // Verify location
-app.post('/api/attendance/verify-location', authenticateToken, (req, res) => {
+app.post('/api/attendance/verify-location', authenticateToken, async (req, res) => {
   try {
-    const { latitude, longitude } = req.body;
-    if (!latitude || !longitude) {
-      return res.status(400).json({ error: "Missing GPS coordinates" });
+    const { telemetry } = req.body;
+    if (!telemetry || !telemetry.location) {
+      return res.status(400).json({ error: "Missing telemetry/location data" });
+    }
+
+    const { latitude, longitude } = telemetry.location;
+
+    // Simulate getting the previous check-in since DB schema migration is pending
+    let lastCheckIn = null;
+    try {
+        const checkResult = await pool.query(
+            "SELECT 11.076585 AS latitude, 77.142008 AS longitude, EXTRACT(EPOCH FROM (NOW() - INTERVAL '1 day')) * 1000 AS timestamp"
+         );
+         lastCheckIn = checkResult.rows[0];
+    } catch(e) { }
+
+    const validationResult = await validateCheckIn({
+        telemetry,
+        ip: req.ip || req.connection?.remoteAddress || "127.0.0.1"
+    }, lastCheckIn);
+
+    if (!validationResult.success) {
+      return res.status(403).json({ 
+          error: "Security validation failed: " + validationResult.flags.join(", "),
+          details: validationResult
+      });
     }
 
    
@@ -461,7 +485,7 @@ app.post('/api/attendance/verify-location', authenticateToken, (req, res) => {
       return res.status(403).json({ error: `Outside allowed area (Dist: ${Math.round(distance)}m). Your Pos: LAT ${latitude}, LNG ${longitude}` });
     }
 
-    res.json({ success: true, message: "Location verified" });
+    res.json({ success: true, message: "Location & Telemetry verified", validation: validationResult });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -527,6 +551,31 @@ app.get('/api/attendance/my-today', authenticateToken, async (req, res) => {
     );
 
     res.json(result.rows.length > 0 ? result.rows[0] : null);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get current user's attendance for a specific month (for calendar view)
+app.get('/api/attendance/my-monthly', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { year, month } = req.query; // month is 1-indexed
+
+    if (!year || !month) {
+      return res.status(400).json({ error: "year and month query params are required" });
+    }
+
+    const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+    // Last day of the month
+    const endDate = new Date(parseInt(year), parseInt(month), 0).toISOString().split('T')[0];
+
+    const result = await pool.query(
+      'SELECT id, date, status, punch_in, punch_out, remark FROM attendance WHERE employee_id = $1 AND date >= $2 AND date <= $3 ORDER BY date ASC',
+      [userId, startDate, endDate]
+    );
+
+    res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

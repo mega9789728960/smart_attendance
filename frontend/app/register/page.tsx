@@ -123,9 +123,7 @@ export default function RegisterPage() {
 
       <div className="w-full max-w-md card bg-white/90 relative z-10 p-8">
         <div className="text-center mb-6">
-          <div className="flex justify-center mb-5">
-            <img src="/logo.png" alt="Logo" className="w-[120px] h-[120px] object-contain drop-shadow-sm transition-transform hover:scale-105 duration-300" />
-          </div>
+
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
             Create Account
           </h1>
