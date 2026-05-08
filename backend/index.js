@@ -7,11 +7,22 @@ const nodemailer = require('nodemailer');
 const { validateCheckIn } = require('./validation');
 require('dotenv').config();
 
+console.log('[SMTP INIT] Email:', process.env.SMTP_EMAIL);
+console.log('[SMTP INIT] Password set:', !!process.env.SMTP_PASSWORD);
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: process.env.SMTP_EMAIL,
     pass: process.env.SMTP_PASSWORD
+  }
+});
+
+transporter.verify((err, success) => {
+  if (err) {
+    console.error('[SMTP VERIFY] Connection FAILED:', err.message);
+  } else {
+    console.log('[SMTP VERIFY] Connection SUCCESS - ready to send');
   }
 });
 
@@ -64,11 +75,15 @@ app.post('/api/auth/register-send-otp', async (req, res) => {
       text: `Your OTP for confirming your registration is: ${otp}. It will expire in 15 minutes.`
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Mail Error:', error);
-      }
-    });
+    console.log('[REGISTER OTP] Sending email to:', email);
+    console.log('[REGISTER OTP] From:', process.env.SMTP_EMAIL);
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log('[REGISTER OTP] Email sent successfully:', info.response);
+    } catch (mailErr) {
+      console.error('[REGISTER OTP] Email FAILED:', mailErr.message);
+      console.error('[REGISTER OTP] Full error:', JSON.stringify(mailErr));
+    }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -217,11 +232,15 @@ app.post('/api/auth/forgot-password', async (req, res) => {
       text: `Your OTP for password reset is: ${otp}. It will expire in 15 minutes.`
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Mail Error:', error);
-      }
-    });
+    console.log('[FORGOT PWD] Sending email to:', email);
+    console.log('[FORGOT PWD] From:', process.env.SMTP_EMAIL);
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log('[FORGOT PWD] Email sent successfully:', info.response);
+    } catch (mailErr) {
+      console.error('[FORGOT PWD] Email FAILED:', mailErr.message);
+      console.error('[FORGOT PWD] Full error:', JSON.stringify(mailErr));
+    }
 
     const token = jwt.sign({ email }, process.env.JWT_SECRET || 'secretkey', { expiresIn: '15m' });
     res.json({ token, message: "OTP sent successfully" });
