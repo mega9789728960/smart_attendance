@@ -482,10 +482,11 @@ app.post('/api/attendance/verify-location', authenticateToken, async (req, res) 
 
    
 
-    const CAMPUS_LAT =  11.076584718705732;
-    const CAMPUS_LNG =77.14200797116403;
-  
-  
+    const CAMPUS_LAT =  10.693936044469472;
+    const CAMPUS_LNG =78.97637792243154;
+
+
+
     const ALLOWED_RADIUS = 2000; // meters
 
     const R = 6371000;
